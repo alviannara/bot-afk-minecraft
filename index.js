@@ -20,9 +20,9 @@ function createMinecraftBot() {
   console.log('[Bot] Mencoba menghubungkan ke server...');
 
   const bot = mineflayer.createBot({
-    host: 'IP_SERVER_MINECRAFT_ANDA', // <--- GANTI DENGAN IP/DOMAIN SERVER ANDA
-    port: 25565,                      // <--- Ganti jika server menggunakan port berbeda
-    username: 'Bot_AFK_Render',       // Nama bot di dalam game
+    host: 'society.playserver.pro', // <--- GANTI DENGAN IP/DOMAIN SERVER ANDA
+    port: 25575,                      // <--- Ganti jika server menggunakan port berbeda
+    username: 'Bot_AFK',       // Nama bot di dalam game
     
     // BARIS VERSION DIHAPUS SENGAJA
     // Biarkan Mineflayer mendeteksi versi protokol server secara otomatis
