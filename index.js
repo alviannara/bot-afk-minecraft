@@ -2,37 +2,63 @@ const mineflayer = require('mineflayer');
 const express = require('express');
 const app = express();
 
-// Web server mini untuk memancing UptimeRobot
+// ==========================================
+// 1. WEB SERVER MINI (UNTUK UPTIMEROBOT)
+// ==========================================
 const PORT = process.env.PORT || 3000;
 app.get('/', (req, res) => {
-  res.send('Bot AFK Minecraft Anda sedang online!');
+  res.send('Bot AFK Minecraft Render Online dan Aktif!');
 });
 app.listen(PORT, () => {
-  console.log(`Web server mendengarkan pada port ${PORT}`);
+  console.log(`[Web Server] Mendengarkan pada port ${PORT}`);
 });
 
-// Logika Utama Bot Minecraft
+// ==========================================
+// 2. LOGIKA UTAMA BOT MINECRAFT
+// ==========================================
 function createMinecraftBot() {
+  console.log('[Bot] Mencoba menghubungkan ke server...');
+
   const bot = mineflayer.createBot({
-    host: 'society.playserver.pro', // Ganti dengan IP/Domain Server Minecraft Anda
-    port: 25575,                // Ganti jika port server berbeda (Default: 25565)
-    username: 'Bot_AFK', // Nama karakter bot di dalam game
-    version: '26.3'           // Sesuaikan dengan versi server Minecraft Anda
+    host: 'IP_SERVER_MINECRAFT_ANDA', // <--- GANTI DENGAN IP/DOMAIN SERVER ANDA
+    port: 25565,                      // <--- Ganti jika server menggunakan port berbeda
+    username: 'Bot_AFK_Render',       // Nama bot di dalam game
+    
+    // BARIS VERSION DIHAPUS SENGAJA
+    // Biarkan Mineflayer mendeteksi versi protokol server secara otomatis
   });
 
+  // Event saat bot berhasil masuk ke dalam game
   bot.on('spawn', () => {
-    console.log('Bot berhasil masuk ke dalam server Minecraft.');
+    console.log('[Bot] SUKSES! Bot telah masuk ke dalam server Minecraft.');
+    
+    // Perbaikan khusus untuk protokol Minecraft terbaru (v26.3+)
+    // Mengirim paket 'tick_end' secara berkala agar tidak terputus/ditolak server
+    bot.on('physicsTick', () => {
+      if (bot._client) {
+        try {
+          bot._client.write('tick_end', {});
+        } catch (e) {
+          // Mengabaikan error jika paket belum didukung oleh versi server tertentu
+        }
+      }
+    });
   });
 
-  // Fitur Anti-Disconnect (Otomatis login ulang jika DC atau dikick)
+  // Event jika bot otomatis terputus dari server (Anti-Disconnect)
   bot.on('end', (reason) => {
-    console.log(`Bot terputus karena: ${reason}. Mencoba masuk kembali dalam 10 detik...`);
+    console.log(`[Bot] Terputus dari server karena: ${reason}`);
+    console.log('[Bot] Menunggu 15 detik sebelum mencoba masuk kembali...');
     setTimeout(() => {
       createMinecraftBot();
-    }, 10000);
+    }, 15000);
   });
 
-  bot.on('error', (err) => console.log('Terjadi error pada bot:', err));
+  // Menangkap error agar aplikasi di Render tidak crash total
+  bot.on('error', (err) => {
+    console.log('[Bot Error] Terjadi kesalahan sistem:', err.message);
+  });
 }
 
+// Jalankan fungsi bot pertama kali
 createMinecraftBot();
